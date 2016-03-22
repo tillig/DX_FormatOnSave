@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="All" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!--
+		* Standard build = msbuild Default.proj
+		* Release build = msbuild Default.proj /p:Configuration=Release
+	-->
+	<PropertyGroup>
+		<Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+		<BuildDir>build_output</BuildDir>
+		<BuildBinDir>$(BuildDir)\bin</BuildBinDir>
+		<BuildLogDir>$(BuildDir)\log</BuildLogDir>
+		<BuildPackageDir>$(BuildDir)\package</BuildPackageDir>
+	</PropertyGroup>
+	<ItemGroup>
+		<CleanFolders Include="$(BuildDir)"/>
+		<CleanFolders Include="DX_FormatOnSave\bin"/>
+		<CleanFolders Include="DX_FormatOnSave\obj"/>
+	</ItemGroup>
+	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+	<Target Name="All">
+		<CallTarget Targets="Clean;Compile;Test"/>
+		<CallTarget Targets="Package" Condition="'$(Configuration)' == 'Release'"/>
+		<Message Text="Build complete."/>
+	</Target>
+	<Target Name="Compile">
+		<Message Text="Creating build output folder hierarchy..."/>
+		<MakeDir Directories="$(BuildDir);$(BuildBinDir);$(BuildLogDir)"/>
+		<Message Text="Compiling DX_FormatOnSave plugin..."/>
+		<MSBuild Projects="DX_FormatOnSave.sln" Properties="Configuration=$(Configuration)"/>
+		<CreateItem Include="DX_FormatOnSave\bin\$(Configuration)\DX_FormatOnSave.*">
+			<Output TaskParameter="Include" ItemName="BuildOutput"/>
+		</CreateItem>
+		<Copy SourceFiles="@(BuildOutput)" DestinationFolder="$(BuildBinDir)"/>
+		<CreateItem Include="DX_FormatOnSave\bin\$(Configuration)\*.CodeAnalysisLog.xml">
+			<Output TaskParameter="Include" ItemName="LogOutput"/>
+		</CreateItem>
+		<Copy SourceFiles="@(LogOutput)" DestinationFolder="$(BuildLogDir)"/>
+		<Message Text="Plugin compiled."/>
+	</Target>
+	<Target Name="Clean">
+		<Message Text="Removing compilation artifact folders..."/>
+		<RemoveDir Directories="@(CleanFolders)"/>
+		<Delete Files="@(CleanFiles)"/>
+		<Message Text="Clean complete."/>
+	</Target>
+	<Target Name="Test">
+		<!-- When there are unit tests, run them here. -->
+	</Target>
+	<Target Name="Package">
+		<MakeDir Directories="$(BuildPackageDir)"/>
+		<GetAssemblyIdentity AssemblyFiles="$(BuildBinDir)\DX_FormatOnSave.dll">
+			<Output ItemName="AssemblyIdentities" TaskParameter="Assemblies"/>
+		</GetAssemblyIdentity>
+		<CreateProperty Value="%(AssemblyIdentities.Version)">
+			<Output PropertyName="Version" TaskParameter="Value"/>
+		</CreateProperty>
+		<CreateItem Include="$(BuildBinDir)\DX_FormatOnSave.dll;readme.html">
+			<Output ItemName="BinaryPackageFiles" TaskParameter="Include"/>
+		</CreateItem>
+		<Zip Files="@(BinaryPackageFiles)" ZipFileName="$(BuildPackageDir)\DX_FormatOnSave-$(Version).zip" Flatten="true"/>
+		<Copy SourceFiles="$(BuildBinDir)\DX_FormatOnSave.vsix" DestinationFolder="$(BuildPackageDir)" />
+	</Target>
+</Project>
