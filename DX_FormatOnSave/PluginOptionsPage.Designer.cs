@@ -1,5 +1,6 @@
 using System;
 using DevExpress.CodeRush.Engine;
+using DevExpress.CodeRush.Platform.Options;
 
 namespace DX_FormatOnSave
 {
@@ -186,11 +187,11 @@ namespace DX_FormatOnSave
 		/// <value>
 		/// The storage object for the options window.
 		/// </value>
-		public static DecoupledStorage Storage
+		public static IOptionsStorageService Storage
 		{
 			get
 			{
-				return DevExpress.CodeRush.Engine.CodeRush.Options.GetStorage(GetCategory(), GetPageName());
+				return CodeRush.Options.GetStorage();
 			}
 		}
 
@@ -230,7 +231,7 @@ namespace DX_FormatOnSave
 		/// </summary>
 		public new static void Show()
 		{
-			DevExpress.CodeRush.Core.CodeRush.Command.Execute("Options", FullPath);
+			CodeRush.Command.Execute("Options", FullPath);
 		}
 
 		private System.Windows.Forms.CheckBox chkEnabled;

@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using DevExpress.CodeRush.Core;
+using DevExpress.CodeRush.Foundation.Options;
 
 namespace DX_FormatOnSave
 {
