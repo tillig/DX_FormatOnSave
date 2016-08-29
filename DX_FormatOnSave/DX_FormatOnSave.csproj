@@ -126,20 +126,13 @@
       <DependentUpon>FormatOnSavePlugin.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="LanguagesToFormatOptionsCreator.cs" />
     <Compile Include="OptionSet.cs" />
     <Compile Include="PluginOptionsPage.cs" />
-    <Compile Include="PluginOptionsPage.Designer.cs">
-      <DependentUpon>PluginOptionsPage.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunningDocumentTableConnectionPoint.cs" />
     <Compile Include="RunningDocumentTableEventProvider.cs" />
     <Compile Include="VsixPluginExtension.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="PluginOptionsPage.resx">
-      <DependentUpon>PluginOptionsPage.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
