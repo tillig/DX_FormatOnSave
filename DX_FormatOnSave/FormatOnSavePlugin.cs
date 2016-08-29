@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Reflection;
 using System.Threading;
+using DevExpress.CodeAnalysis.Workspaces;
 using DevExpress.CodeRush.Engine;
 using DevExpress.CodeRush.Platform.Diagnostics;
-using DevExpress.CodeRush.PlugInCore;
+using DevExpress.CodeRush.Platform.Options;
+using DevExpress.CodeRush.TextEditor;
+using Microsoft.CodeAnalysis.Text;
 
 namespace DX_FormatOnSave
 {
@@ -43,27 +46,8 @@ namespace DX_FormatOnSave
 	/// </remarks>
 	public partial class FormatOnSavePlugin : StandardPlugIn
 	{
-		/// <summary>
-		/// Reflection lookup for a document full name. Used if the document has
-		/// already been closed so we can find the original path.
-		/// </summary>
-		private static readonly FieldInfo _fullNameFieldInfo = typeof(Document).GetField("_FullName", BindingFlags.Instance | BindingFlags.GetField | BindingFlags.NonPublic);
-
-		/// <summary>
-		/// Keeps track of which documents are currently being formatted so
-		/// we don't end up in an endless loop of format/save.
-		/// </summary>
-		private List<Document> _docsBeingFormatted = new List<Document>();
-
-		/// <summary>
-		/// Synchronizes access to the list of docs being formatted.
-		/// </summary>
-		private object _listSync = new object();
-
-		/// <summary>
-		/// Raises events for documents being saved.
-		/// </summary>
-		private RunningDocumentTableEventProvider _docEvents = null;
+		[Import]
+		public IFormattingServices Formatting { get; set; }
 
 		/// <summary>
 		/// Gets or sets the options for the plugin.
@@ -73,6 +57,133 @@ namespace DX_FormatOnSave
 		/// is using.
 		/// </value>
 		public OptionSet Options { get; set; }
+
+		[Import]
+		public IOptionsStorageService OptionsStorage { get; set; }
+
+		/// <summary>
+		/// Formats and re-saves a document.
+		/// </summary>
+		/// <param name="doc">The document to format.</param>
+		/// <exception cref="System.ArgumentNullException">
+		/// Thrown if <paramref name="doc" /> is <see langword="null" />.
+		/// </exception>
+		public void FormatDocument(ITextDocument doc)
+		{
+			if (doc == null)
+			{
+				throw new ArgumentNullException(nameof(doc));
+			}
+
+			// TODO: Handle save-on-close documents.
+			// Issue #147: You have to handle documents that were save-on-close
+			// differently than documents that are currently open.
+			// Closed documents return null for the full name because they've
+			// been disposed and there's no backing VS DocumentObject.
+			var docFullName = doc.FilePath;
+
+			// The TextBuffers collection will have the document if it's open.
+			var textBuffer = doc.TextBuffer;
+			if (textBuffer == null)
+			{
+				Log.SendError("Unable to load text buffer for formatting document '{0}'", docFullName);
+				return;
+			}
+
+			// Format the document and if it's successful write the changes back.
+			this.Formatting.Format(doc, new TextSpan(0, textBuffer.Length));
+
+			// TODO: SAVE DOC
+			//if (isClosed)
+			//{
+			//	UpdateClosedDocument(docFullName, textBuffer.Text);
+			//}
+			//else
+			//{
+			//	doc.Save(docFullName);
+			//}
+		}
+
+		/// <summary>
+		/// Finalizes the plug in.
+		/// </summary>
+		public override void FinalizePlugIn()
+		{
+			if (this.OptionsStorage != null)
+			{
+				this.OptionsStorage.OptionsChanged -= this.FormatOnSavePlugin_OptionsChanged;
+			}
+
+			base.FinalizePlugIn();
+		}
+
+		/// <summary>
+		/// Initializes the plug in.
+		/// </summary>
+		public override void InitializePlugIn()
+		{
+			base.InitializePlugIn();
+			if (this.OptionsStorage != null)
+			{
+				this.OptionsStorage.OptionsChanged += this.FormatOnSavePlugin_OptionsChanged;
+			}
+
+			this.RefreshOptions();
+		}
+
+		/// <summary>
+		/// Determines whether a document should be formatted based on the provided
+		/// language ID and the user's selected options.
+		/// </summary>
+		/// <param name="language">The language ID for the document in question.</param>
+		/// <returns>
+		/// <see langword="true" /> if the user elected to format documents of the
+		/// given language; <see langword="false" /> if not.
+		/// </returns>
+		public bool LanguageSelectedForFormatting(string language)
+		{
+			if (string.IsNullOrEmpty(language))
+			{
+				return false;
+			}
+
+			return false;
+			//TODO: this.Options.LanguagesToFormat.Contains(selected);
+		}
+
+		/// <summary>
+		/// Refreshes the set of options being used by this plugin.
+		/// </summary>
+		public void RefreshOptions()
+		{
+			this.Options = this.OptionsStorage.GetOptions<OptionSet>();
+		}
+
+		/// <summary>
+		/// Saves/overwrites the contents of a closed document.
+		/// </summary>
+		/// <param name="path">
+		/// The path to the document to overwrite.
+		/// </param>
+		/// <param name="content">
+		/// The new content that should be in the file.
+		/// </param>
+		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "The file stream gets disposed through the using and inside the writer, but it's OK to double-dispose a stream.")]
+		private static void UpdateClosedDocument(string path, string content)
+		{
+			// If the document is closed, we have to manually save
+			// it using an exclusive locking filestream. Without the
+			// locking, VS may not have fully written the doc yet and we
+			// end up in a race condition where the file contents
+			// get all mangled.
+			using (var stream = File.Open(path, FileMode.Truncate, FileAccess.Write, FileShare.None))
+			{
+				using (var writer = new StreamWriter(stream))
+				{
+					writer.Write(content);
+				}
+			}
+		}
 
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching any problems that go on during post-save formatting.")]
 		private void DocumentSaving(object sender, DocumentEventArgs e)
@@ -135,7 +246,7 @@ namespace DX_FormatOnSave
 		/// is one of the selected languages to format; <see langword="false" />
 		/// otherwise.
 		/// </returns>
-		private bool DocumentShouldBeFormatted(Document doc)
+		private bool DocumentShouldBeFormatted(ITextDocument doc)
 		{
 			// If the user disabled the plugin, bail.
 			if (!this.Options.Enabled)
@@ -144,191 +255,23 @@ namespace DX_FormatOnSave
 			}
 
 			// If the document isn't text or an enabled language, bail.
-			TextDocument textDoc = doc as TextDocument;
-			if (textDoc == null || !this.LanguageSelectedForFormatting(textDoc.Language))
-			{
-				return false;
-			}
-			return true;
+			return this.LanguageSelectedForFormatting(doc.GetLanguage());
 		}
 
-		/// <summary>
-		/// Finalizes the plug in.
-		/// </summary>
-		public override void FinalizePlugIn()
-		{
-			this._docEvents.Dispose();
-			this._docEvents = null;
-			base.FinalizePlugIn();
-		}
-
-		/// <summary>
-		/// Formats and re-saves a document.
-		/// </summary>
-		/// <param name="doc">The document to format.</param>
-		/// <exception cref="System.ArgumentNullException">
-		/// Thrown if <paramref name="doc" /> is <see langword="null" />.
-		/// </exception>
-		public static void FormatDocument(Document doc)
-		{
-			if (doc == null)
-			{
-				throw new ArgumentNullException("doc");
-			}
-
-			// Issue #147: You have to handle documents that were save-on-close
-			// differently than documents that are currently open.
-			// Closed documents return null for the full name because they've
-			// been disposed and there's no backing VS DocumentObject.
-			var isClosed = doc.FullName == null;
-			var docFullName = GetDocFullName(doc);
-
-			// The TextBuffers collection will have the document if it's open.
-			var textBuffer = CodeRush.TextBuffers[docFullName];
-			if (textBuffer == null && docFullName != null)
-			{
-				// If the document has already closed, we can re-open it in the
-				// background to format it.
-				textBuffer = CodeRush.TextBuffers.Open(docFullName);
-			}
-			if (textBuffer == null)
-			{
-				Log.SendError("Unable to load text buffer for formatting document '{0}'", docFullName);
-				return;
-			}
-
-			// Format the document and if it's successful write the changes back.
-			var result = textBuffer.Format(textBuffer.Range);
-			if (result != FormatResult.Success)
-			{
-				Log.SendError("Unable to format document '{0}'.", docFullName);
-			}
-			if (isClosed)
-			{
-				UpdateClosedDocument(docFullName, textBuffer.Text);
-			}
-			else
-			{
-				doc.Save(docFullName);
-			}
-		}
-
-		private void FormatOnSavePlugin_OptionsChanged(OptionsChangedEventArgs ea)
+		private void FormatOnSavePlugin_OptionsChanged(object sender, OptionsChangedEventArgs ea)
 		{
 			this.RefreshOptions();
 		}
 
 		/// <summary>
-		/// Gets the full name/path for a document even if it's closed.
+		/// Keeps track of which documents are currently being formatted so
+		/// we don't end up in an endless loop of format/save.
 		/// </summary>
-		/// <param name="doc">
-		/// The document for which the name should be retrieved.
-		/// </param>
-		/// <returns>
-		/// A <see cref="System.String"/> with the document full name/path.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">
-		/// Thrown if <paramref name="doc" /> is <see langword="null" />.
-		/// </exception>
-		public static string GetDocFullName(Document doc)
-		{
-			if (doc == null)
-			{
-				throw new ArgumentNullException("doc");
-			}
-			var docFullName = doc.FullName;
-			if (docFullName == null && _fullNameFieldInfo != null)
-			{
-				// The document name will be null if the file is closed, but the
-				// private instance property will still have the filename we need
-				// to re-format.
-				docFullName = _fullNameFieldInfo.GetValue(doc) as String;
-			}
-			return docFullName;
-		}
+		private List<ITextDocument> _docsBeingFormatted = new List<ITextDocument>();
 
 		/// <summary>
-		/// Initializes the plug in.
+		/// Synchronizes access to the list of docs being formatted.
 		/// </summary>
-		public override void InitializePlugIn()
-		{
-			base.InitializePlugIn();
-			this.OptionsChanged += FormatOnSavePlugin_OptionsChanged;
-			this._docEvents = new RunningDocumentTableEventProvider();
-			this._docEvents.Initialize();
-			this._docEvents.Saving += DocumentSaving;
-			this.RefreshOptions();
-		}
-
-		/// <summary>
-		/// Determines whether a document should be formatted based on the provided
-		/// language ID and the user's selected options.
-		/// </summary>
-		/// <param name="language">The language ID for the document in question.</param>
-		/// <returns>
-		/// <see langword="true" /> if the user elected to format documents of the
-		/// given language; <see langword="false" /> if not.
-		/// </returns>
-		public bool LanguageSelectedForFormatting(string language)
-		{
-			if (String.IsNullOrEmpty(language))
-			{
-				return false;
-			}
-			switch (language)
-			{
-				case DevExpress.DXCore.Constants.Str.Language.CPlusPlus:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.CPlusPlus) == DocumentLanguages.CPlusPlus;
-				case DevExpress.DXCore.Constants.Str.Language.CSharp:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.CSharp) == DocumentLanguages.CSharp;
-				case DevExpress.DXCore.Constants.Str.Language.CSS:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.Css) == DocumentLanguages.Css;
-				case DevExpress.DXCore.Constants.Str.Language.HTML:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.Html) == DocumentLanguages.Html;
-				case DevExpress.DXCore.Constants.Str.Language.JavaScript:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.JavaScript) == DocumentLanguages.JavaScript;
-				case DevExpress.DXCore.Constants.Str.Language.VisualBasic:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.VisualBasic) == DocumentLanguages.VisualBasic;
-				case DevExpress.DXCore.Constants.Str.Language.XAML:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.Xaml) == DocumentLanguages.Xaml;
-				case DevExpress.DXCore.Constants.Str.Language.XML:
-				case DevExpress.DXCore.Constants.Str.Language.XMLOnly:
-					return (this.Options.LanguagesToFormat & DocumentLanguages.Xml) == DocumentLanguages.Xml;
-				default:
-					return false;
-			}
-		}
-
-		/// <summary>
-		/// Refreshes the set of options being used by this plugin.
-		/// </summary>
-		public void RefreshOptions()
-		{
-			this.Options = OptionSet.Load(PluginOptionsPage.Storage);
-		}
-
-		/// <summary>
-		/// Saves/overwrites the contents of a closed document.
-		/// </summary>
-		/// <param name="path">
-		/// The path to the document to overwrite.
-		/// </param>
-		/// <param name="content">
-		/// The new content that should be in the file.
-		/// </param>
-		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Justification = "The file stream gets disposed through the using and inside the writer, but it's OK to double-dispose a stream.")]
-		private static void UpdateClosedDocument(string path, string content)
-		{
-			// If the document is closed, we have to manually save
-			// it using an exclusive locking filestream. Without the
-			// locking, VS may not have fully written the doc yet and we
-			// end up in a race condition where the file contents
-			// get all mangled.
-			using (var stream = File.Open(path, FileMode.Truncate, FileAccess.Write, FileShare.None))
-			using (var writer = new StreamWriter(stream))
-			{
-				writer.Write(content);
-			}
-		}
+		private object _listSync = new object();
 	}
 }

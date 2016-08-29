@@ -12,9 +12,18 @@ namespace DX_FormatOnSave
 	public class PluginOptionsPage : OptionsPage
 	{
 		/// <summary>
-		/// Required designer variable.
+		/// Gets the options being worked with in this window.
 		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+		/// <value>
+		/// A <see cref="DX_FormatOnSave.OptionSet"/> with the current options.
+		/// </value>
+		private OptionSet Options
+		{
+			get
+			{
+				return this.OptionsContainer as OptionSet;
+			}
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DX_FormatOnSave.PluginOptionsPage" /> class.
@@ -24,19 +33,6 @@ namespace DX_FormatOnSave
 			// Required for Windows.Forms Class Composition Designer support
 			InitializeComponent();
 		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-				components.Dispose();
-			base.Dispose(disposing);
-		}
-
-		#region Windows Form Designer generated code
 
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -55,8 +51,6 @@ namespace DX_FormatOnSave
 			this.chkCSharp = new System.Windows.Forms.CheckBox();
 			this.chkCPlusPlus = new System.Windows.Forms.CheckBox();
 			this.languageFormatSelectors.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
-			this.SuspendLayout();
 			//
 			// chkEnabled
 			//
@@ -169,72 +163,10 @@ namespace DX_FormatOnSave
 			//
 			// PlugInOptionsPage
 			//
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.Controls.Add(this.languageFormatSelectors);
-			this.Controls.Add(this.chkEnabled);
 			this.Name = "PluginOptionsPage";
 			this.languageFormatSelectors.ResumeLayout(false);
 			this.languageFormatSelectors.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this)).EndInit();
-			this.ResumeLayout(false);
-			this.PerformLayout();
 
-		}
-
-		#endregion
-
-		/// <summary>
-		/// Gets a <see cref="DevExpress.CodeRush.Core.DecoupledStorage"/> object that
-		/// pertains to this options window.
-		/// </summary>
-		/// <value>
-		/// The storage object for the options window.
-		/// </value>
-		public static IOptionsStorageService Storage
-		{
-			get
-			{
-				return CodeRush.Options.GetStorage();
-			}
-		}
-
-		/// <summary>
-		/// Returns the category of this options page.
-		/// </summary>
-		public override string Category
-		{
-			get
-			{
-				return PluginOptionsPage.GetCategory();
-			}
-		}
-		/// <summary>
-		/// Returns the page name of this options page.
-		/// </summary>
-		public override string PageName
-		{
-			get
-			{
-				return PluginOptionsPage.GetPageName();
-			}
-		}
-		/// <summary>
-		/// Returns the full path (Category + PageName) of this options page.
-		/// </summary>
-		public static string FullPath
-		{
-			get
-			{
-				return GetCategory() + "\\" + GetPageName();
-			}
-		}
-
-		/// <summary>
-		/// Displays the DXCore options dialog and selects this page.
-		/// </summary>
-		public new static void Show()
-		{
-			CodeRush.Command.Execute("Options", FullPath);
 		}
 
 		private System.Windows.Forms.CheckBox chkEnabled;
@@ -247,13 +179,6 @@ namespace DX_FormatOnSave
 		private System.Windows.Forms.CheckBox chkHtml;
 		private System.Windows.Forms.CheckBox chkCss;
 		private System.Windows.Forms.CheckBox chkCSharp;
-		/// <summary>
-		/// Gets the options being worked with in this window.
-		/// </summary>
-		/// <value>
-		/// A <see cref="DX_FormatOnSave.OptionSet"/> with the current options.
-		/// </value>
-		public OptionSet Options { get; private set; }
 
 		/// <summary>
 		/// Initializes this instance.
