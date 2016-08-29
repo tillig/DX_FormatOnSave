@@ -1,5 +1,5 @@
 ﻿using System;
-using DevExpress.CodeRush.Core;
+using DevExpress.CodeRush.Engine;
 
 namespace DX_FormatOnSave
 {

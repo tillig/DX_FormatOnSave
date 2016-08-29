@@ -4,8 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using DevExpress.CodeRush.Core;
-using DevExpress.CodeRush.Diagnostics.Commands;
+using DevExpress.CodeRush.Engine;
+using DevExpress.CodeRush.Platform.Diagnostics;
 using DevExpress.CodeRush.PlugInCore;
 
 namespace DX_FormatOnSave

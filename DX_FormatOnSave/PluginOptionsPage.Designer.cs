@@ -1,5 +1,5 @@
 using System;
-using DevExpress.CodeRush.Core;
+using DevExpress.CodeRush.Engine;
 
 namespace DX_FormatOnSave
 {
@@ -13,7 +13,7 @@ namespace DX_FormatOnSave
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DX_FormatOnSave.PluginOptionsPage" /> class.
 		/// </summary>
-        public PluginOptionsPage()
+		public PluginOptionsPage()
 		{
 			// Required for Windows.Forms Class Composition Designer support
 			InitializeComponent();
@@ -53,9 +53,9 @@ namespace DX_FormatOnSave
 			this.languageFormatSelectors.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
 			this.SuspendLayout();
-			// 
+			//
 			// chkEnabled
-			// 
+			//
 			this.chkEnabled.AutoSize = true;
 			this.chkEnabled.Location = new System.Drawing.Point(4, 4);
 			this.chkEnabled.Name = "chkEnabled";
@@ -64,9 +64,9 @@ namespace DX_FormatOnSave
 			this.chkEnabled.Text = "Enabled";
 			this.chkEnabled.UseVisualStyleBackColor = true;
 			this.chkEnabled.CheckedChanged += new System.EventHandler(this.chkEnabled_CheckedChanged);
-			// 
+			//
 			// languageFormatSelectors
-			// 
+			//
 			this.languageFormatSelectors.Controls.Add(this.chkXml);
 			this.languageFormatSelectors.Controls.Add(this.chkXaml);
 			this.languageFormatSelectors.Controls.Add(this.chkVisualBasic);
@@ -82,9 +82,9 @@ namespace DX_FormatOnSave
 			this.languageFormatSelectors.TabIndex = 1;
 			this.languageFormatSelectors.TabStop = false;
 			this.languageFormatSelectors.Text = "Document types to format on save";
-			// 
+			//
 			// chkXml
-			// 
+			//
 			this.chkXml.AutoSize = true;
 			this.chkXml.Location = new System.Drawing.Point(7, 187);
 			this.chkXml.Name = "chkXml";
@@ -92,9 +92,9 @@ namespace DX_FormatOnSave
 			this.chkXml.TabIndex = 7;
 			this.chkXml.Text = "XML";
 			this.chkXml.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkXaml
-			// 
+			//
 			this.chkXaml.AutoSize = true;
 			this.chkXaml.Location = new System.Drawing.Point(7, 163);
 			this.chkXaml.Name = "chkXaml";
@@ -102,9 +102,9 @@ namespace DX_FormatOnSave
 			this.chkXaml.TabIndex = 6;
 			this.chkXaml.Text = "XAML";
 			this.chkXaml.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkVisualBasic
-			// 
+			//
 			this.chkVisualBasic.AutoSize = true;
 			this.chkVisualBasic.Location = new System.Drawing.Point(7, 139);
 			this.chkVisualBasic.Name = "chkVisualBasic";
@@ -112,9 +112,9 @@ namespace DX_FormatOnSave
 			this.chkVisualBasic.TabIndex = 5;
 			this.chkVisualBasic.Text = "Visual Basic .NET";
 			this.chkVisualBasic.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkJavaScript
-			// 
+			//
 			this.chkJavaScript.AutoSize = true;
 			this.chkJavaScript.Location = new System.Drawing.Point(7, 115);
 			this.chkJavaScript.Name = "chkJavaScript";
@@ -122,9 +122,9 @@ namespace DX_FormatOnSave
 			this.chkJavaScript.TabIndex = 4;
 			this.chkJavaScript.Text = "JavaScript";
 			this.chkJavaScript.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkHtml
-			// 
+			//
 			this.chkHtml.AutoSize = true;
 			this.chkHtml.Location = new System.Drawing.Point(7, 91);
 			this.chkHtml.Name = "chkHtml";
@@ -132,9 +132,9 @@ namespace DX_FormatOnSave
 			this.chkHtml.TabIndex = 3;
 			this.chkHtml.Text = "HTML";
 			this.chkHtml.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkCss
-			// 
+			//
 			this.chkCss.AutoSize = true;
 			this.chkCss.Location = new System.Drawing.Point(7, 67);
 			this.chkCss.Name = "chkCss";
@@ -142,9 +142,9 @@ namespace DX_FormatOnSave
 			this.chkCss.TabIndex = 2;
 			this.chkCss.Text = "CSS";
 			this.chkCss.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkCSharp
-			// 
+			//
 			this.chkCSharp.AutoSize = true;
 			this.chkCSharp.Location = new System.Drawing.Point(7, 43);
 			this.chkCSharp.Name = "chkCSharp";
@@ -152,9 +152,9 @@ namespace DX_FormatOnSave
 			this.chkCSharp.TabIndex = 1;
 			this.chkCSharp.Text = "C#";
 			this.chkCSharp.UseVisualStyleBackColor = true;
-			// 
+			//
 			// chkCPlusPlus
-			// 
+			//
 			this.chkCPlusPlus.AutoSize = true;
 			this.chkCPlusPlus.Location = new System.Drawing.Point(7, 19);
 			this.chkCPlusPlus.Name = "chkCPlusPlus";
@@ -162,9 +162,9 @@ namespace DX_FormatOnSave
 			this.chkCPlusPlus.TabIndex = 0;
 			this.chkCPlusPlus.Text = "C/C++";
 			this.chkCPlusPlus.UseVisualStyleBackColor = true;
-			// 
+			//
 			// PlugInOptionsPage
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.Controls.Add(this.languageFormatSelectors);
 			this.Controls.Add(this.chkEnabled);
@@ -190,7 +190,7 @@ namespace DX_FormatOnSave
 		{
 			get
 			{
-				return DevExpress.CodeRush.Core.CodeRush.Options.GetStorage(GetCategory(), GetPageName());
+				return DevExpress.CodeRush.Engine.CodeRush.Options.GetStorage(GetCategory(), GetPageName());
 			}
 		}
 
