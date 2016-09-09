@@ -12,7 +12,7 @@ namespace DX_FormatOnSave
 		/// <summary>
 		/// Backing store for <see cref="LanguagesToFormat"/>.
 		/// </summary>
-		private ObservableCollection<DocumentLanguages> _languagesToFormat;
+		private ObservableCollection<string> _languagesToFormat;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DX_FormatOnSave.OptionSet" /> class
@@ -21,7 +21,7 @@ namespace DX_FormatOnSave
 		public OptionSet()
 		{
 			this.Enabled = true;
-			this.LanguagesToFormat = new ObservableCollection<DocumentLanguages>();
+			this.LanguagesToFormat = new ObservableCollection<string>();
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace DX_FormatOnSave
 		/// </value>
 		[Option]
 		[OptionDefaultValue(typeof(LanguagesToFormatOptionsCreator), "Neutral")]
-		public ObservableCollection<DocumentLanguages> LanguagesToFormat
+		public ObservableCollection<string> LanguagesToFormat
 		{
 			get
 			{

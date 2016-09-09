@@ -177,33 +177,6 @@ namespace DX_FormatOnSave
 		}
 
 		/// <summary>
-		/// Determines whether a document should be formatted based on the provided
-		/// language ID and the user's selected options.
-		/// </summary>
-		/// <param name="language">The language ID for the document in question.</param>
-		/// <returns>
-		/// <see langword="true" /> if the user elected to format documents of the
-		/// given language; <see langword="false" /> if not.
-		/// </returns>
-		public bool LanguageSelectedForFormatting(string language)
-		{
-			if (string.IsNullOrEmpty(language))
-			{
-				return false;
-			}
-
-			try
-			{
-				var enumValue = (DocumentLanguages)Enum.Parse(typeof(DocumentLanguages), language, true);
-				return this.Options.LanguagesToFormat.Contains(enumValue);
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		/// <summary>
 		/// Refreshes the set of options being used by this plugin.
 		/// </summary>
 		public void RefreshOptions()
@@ -307,7 +280,7 @@ namespace DX_FormatOnSave
 			}
 
 			// If the document isn't text or an enabled language, bail.
-			return this.LanguageSelectedForFormatting(doc.GetLanguage());
+			return this.Options.LanguagesToFormat.Contains(doc.GetLanguage());
 		}
 
 		private void FormatOnSavePlugin_OptionsChanged(object sender, OptionsChangedEventArgs ea)

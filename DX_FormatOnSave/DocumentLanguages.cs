@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DX_FormatOnSave
 {
@@ -6,53 +7,65 @@ namespace DX_FormatOnSave
 	/// Enumeration listing the possible options that the user can choose for which
 	/// document languages should be formatted on save.
 	/// </summary>
-	[Flags]
-	public enum DocumentLanguages
+	public static class DocumentLanguages
 	{
 		/// <summary>
-		/// Language option flag indicating "no languages selected."
+		/// Language option flag corresponding to C++.
 		/// </summary>
-		None = 0,
+		public static readonly string CPlusPlus = "C++";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.CPlusPlus" />.
+		/// Language option flag corresponding to C#.
 		/// </summary>
-		CPlusPlus = 1,
+		public static readonly string CSharp = "C#";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.CSharp" />.
+		/// Language option flag corresponding to CSS.
 		/// </summary>
-		CSharp = 2,
+		public static readonly string Css = "CSS";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.CSS" />.
+		/// Language option flag corresponding to HTML markup.
 		/// </summary>
-		Css = 4,
+		public static readonly string Html = "HTML";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.HTML" />.
+		/// Language option flag corresponding to JavaScript.
 		/// </summary>
-		Html = 8,
+		public static readonly string JavaScript = "Script";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.JavaScript" />.
+		/// Language option flag corresponding to Visual Basic.
 		/// </summary>
-		JavaScript = 16,
+		public static readonly string VisualBasic = "Basic";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.VisualBasic" />.
+		/// Language option flag corresponding to XAML markup.
 		/// </summary>
-		VisualBasic = 32,
+		public static readonly string Xaml = "XAML";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.XAML" />.
+		/// Language option flag corresponding to XML.
 		/// </summary>
-		Xaml = 64,
+		public static readonly string Xml = "XML";
 
 		/// <summary>
-		/// Language option flag corresponding to <see cref="DevExpress.DXCore.Constants.Str.Language.XML" />
-		/// and <see cref="DevExpress.DXCore.Constants.Str.Language.XMLOnly" />.
+		/// Gets display mapping for languages.
 		/// </summary>
-		Xml = 128
+		/// <value>
+		/// An <see cref="IDictionary{TKey, TValue}"/> where the key is the language ID
+		/// and the value is a display string.
+		/// </value>
+		public static IDictionary<string, string> DisplayMapping { get; } = new Dictionary<string, string>()
+		{
+			{ CPlusPlus, "C++" },
+			{ CSharp, "C#" },
+			{ Css, "CSS" },
+			{ Html, "HTML" },
+			{ JavaScript, "JavaScript" },
+			{ VisualBasic, "Visual Basic" },
+			{ Xaml, "XAML" },
+			{ Xml, "XML" }
+		};
 	}
 }

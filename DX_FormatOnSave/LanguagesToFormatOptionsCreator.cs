@@ -17,12 +17,12 @@ namespace DX_FormatOnSave
 		/// The options language being used.
 		/// </param>
 		/// <returns>
-		/// A collection of <see cref="DocumentLanguages"/> indicating the default set of languages to format.
+		/// A collection of language <see cref="string"/> ID values indicating the default set of languages to format.
 		/// </returns>
 		public object CreateDefaultValue(string language)
 		{
-			var coll = new ObservableCollection<DocumentLanguages>();
-			foreach (var item in Enum.GetValues(typeof(DocumentLanguages)).Cast<DocumentLanguages>())
+			var coll = new ObservableCollection<string>();
+			foreach (var item in DocumentLanguages.DisplayMapping.Keys)
 			{
 				coll.Add(item);
 			}
