@@ -52,20 +52,6 @@ namespace DX_FormatOnSave
 		/// </summary>
 		private RunningDocumentTableEventProvider _docEvents = null;
 
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DX_FormatOnSave.FormatOnSavePlugin" /> class.
-		/// </summary>
-		public FormatOnSavePlugin()
-		{
-			// Required for Windows.Forms Class Composition Designer support
-			this.InitializeComponent();
-		}
-
 		[Import]
 		public IFormattingServices Formatting { get; set; }
 
@@ -99,15 +85,17 @@ namespace DX_FormatOnSave
 			{
 				throw new ArgumentNullException(nameof(doc));
 			}
-			var docFullName = doc.FullName;
-			if (docFullName == null && _fullNameFieldInfo != null)
-			{
-				// The document name will be null if the file is closed, but the
-				// private instance property will still have the filename we need
-				// to re-format.
-				docFullName = _fullNameFieldInfo.GetValue(doc) as string;
-			}
-			return docFullName;
+
+			return null;
+			//var docFullName = doc.FullName;
+			//if (docFullName == null && _fullNameFieldInfo != null)
+			//{
+			//	// The document name will be null if the file is closed, but the
+			//	// private instance property will still have the filename we need
+			//	// to re-format.
+			//	docFullName = _fullNameFieldInfo.GetValue(doc) as string;
+			//}
+			//return docFullName;
 		}
 		/// <summary>
 		/// Finalizes the plug in.
@@ -138,37 +126,37 @@ namespace DX_FormatOnSave
 				throw new ArgumentNullException(nameof(doc));
 			}
 
-			// Issue #147: You have to handle documents that were save-on-close
-			// differently than documents that are currently open.
-			// Closed documents return null for the full name because they've
-			// been disposed and there's no backing VS DocumentObject.
-			var isClosed = doc.FullName == null;
-			var docFullName = GetDocFullName(doc);
+			//// Issue #147: You have to handle documents that were save-on-close
+			//// differently than documents that are currently open.
+			//// Closed documents return null for the full name because they've
+			//// been disposed and there's no backing VS DocumentObject.
+			//var isClosed = doc.FullName == null;
+			//var docFullName = GetDocFullName(doc);
 
-			// The TextBuffers collection will have the document if it's open.
-			var textBuffer = doc.TextBuffer;
-			if (textBuffer == null && docFullName != null)
-			{
-				// If the document has already closed, we can re-open it in the
-				// background to format it.
-				textBuffer = CodeRush.TextBuffers.Open(docFullName);
-			}
-			if (textBuffer == null)
-			{
-				Log.SendError("Unable to load text buffer for formatting document '{0}'", docFullName);
-				return;
-			}
+			//// The TextBuffers collection will have the document if it's open.
+			//var textBuffer = doc.TextBuffer;
+			//if (textBuffer == null && docFullName != null)
+			//{
+			//	// If the document has already closed, we can re-open it in the
+			//	// background to format it.
+			//	textBuffer = CodeRush.TextBuffers.Open(docFullName);
+			//}
+			//if (textBuffer == null)
+			//{
+			//	Log.SendError("Unable to load text buffer for formatting document '{0}'", docFullName);
+			//	return;
+			//}
 
-			// Format the document and if it's successful write the changes back.
-			this.Formatting.Format(doc, new TextSpan(0, textBuffer.Length));
-			if (isClosed)
-			{
-				UpdateClosedDocument(docFullName, textBuffer.Text);
-			}
-			else
-			{
-				doc.Save(docFullName);
-			}
+			//// Format the document and if it's successful write the changes back.
+			//this.Formatting.Format(doc, new TextSpan(0, textBuffer.Length));
+			//if (isClosed)
+			//{
+			//	UpdateClosedDocument(docFullName, textBuffer.Text);
+			//}
+			//else
+			//{
+			//	doc.Save(docFullName);
+			//}
 		}
 
 		/// <summary>
@@ -221,20 +209,6 @@ namespace DX_FormatOnSave
 		public void RefreshOptions()
 		{
 			this.Options = this.OptionsStorage.GetOptions<OptionSet>();
-		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		[SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = nameof(this._docEvents), Justification = "Disposing of _docEvents in the plugin finalize method rather than in Dispose.")]
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (this.components != null))
-			{
-				this.components.Dispose();
-			}
-			base.Dispose(disposing);
 		}
 
 		/// <summary>
@@ -341,24 +315,11 @@ namespace DX_FormatOnSave
 			this.RefreshOptions();
 		}
 
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-			this.components = new System.ComponentModel.Container();
-			((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this)).EndInit();
-		}
-
-
 		/// <summary>
 		/// Reflection lookup for a document full name. Used if the document has
 		/// already been closed so we can find the original path.
 		/// </summary>
-		private static readonly FieldInfo _fullNameFieldInfo = typeof(Document).GetField("_FullName", BindingFlags.Instance | BindingFlags.GetField | BindingFlags.NonPublic);
+		//private static readonly FieldInfo _fullNameFieldInfo = typeof(Document).GetField("_FullName", BindingFlags.Instance | BindingFlags.GetField | BindingFlags.NonPublic);
 
 		/// <summary>
 		/// Keeps track of which documents are currently being formatted so

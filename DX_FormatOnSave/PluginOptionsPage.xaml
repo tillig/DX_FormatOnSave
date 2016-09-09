@@ -1,0 +1,11 @@
+﻿<options:OptionsPage x:Class="DX_FormatOnSave.PluginOptionsPage"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:options="clr-namespace:DevExpress.CodeRush.Foundation.Options;assembly=DevExpress.CodeRush.Foundation"
+                     xmlns:local="clr-namespace:DX_FormatOnSave"
+                     Title="Format On Save" HasMultipleLanguageSupport="true">
+  <Grid>
+  </Grid>
+</options:OptionsPage>
