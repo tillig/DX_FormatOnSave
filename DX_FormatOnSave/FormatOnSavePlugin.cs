@@ -102,8 +102,12 @@ namespace DX_FormatOnSave
 		/// </summary>
 		public override void FinalizePlugIn()
 		{
-			this._docEvents.Dispose();
-			this._docEvents = null;
+			if (this._docEvents != null)
+			{
+				this._docEvents.Dispose();
+				this._docEvents = null;
+			}
+
 			if (this.OptionsStorage != null)
 			{
 				this.OptionsStorage.OptionsChanged -= this.FormatOnSavePlugin_OptionsChanged;
@@ -170,9 +174,9 @@ namespace DX_FormatOnSave
 				this.OptionsStorage.OptionsChanged += this.FormatOnSavePlugin_OptionsChanged;
 			}
 
-			this._docEvents = new RunningDocumentTableEventProvider();
-			this._docEvents.Initialize();
-			this._docEvents.Saving += this.DocumentSaving;
+			//this._docEvents = new RunningDocumentTableEventProvider();
+			//this._docEvents.Initialize();
+			//this._docEvents.Saving += this.DocumentSaving;
 			this.RefreshOptions();
 		}
 
