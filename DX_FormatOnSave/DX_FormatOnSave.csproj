@@ -60,31 +60,31 @@
   <ItemGroup>
     <Reference Include="DevExpress.CodeAnalysis.Workspaces">
       <HintPath>..\lib\DevExpress.CodeAnalysis.Workspaces.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.Engine">
       <HintPath>..\lib\DevExpress.CodeRush.Engine.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.Foundation">
       <HintPath>..\lib\DevExpress.CodeRush.Foundation.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.Platform">
       <HintPath>..\lib\DevExpress.CodeRush.Platform.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.TextEditor">
       <HintPath>..\lib\DevExpress.CodeRush.TextEditor.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.VisualStudio">
       <HintPath>..\lib\DevExpress.CodeRush.VisualStudio.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DevExpress.CodeRush.Win32">
       <HintPath>..\lib\DevExpress.CodeRush.Win32.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
